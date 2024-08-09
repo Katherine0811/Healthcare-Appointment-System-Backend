@@ -1,6 +1,9 @@
 package com.tus.healthcare.model;
 
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -17,9 +20,11 @@ public class Users {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     
+    @JsonIgnore
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Patients patient;
 
+    @JsonIgnore
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Providers provider;
     

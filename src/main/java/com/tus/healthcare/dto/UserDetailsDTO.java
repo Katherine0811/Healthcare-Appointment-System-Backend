@@ -10,12 +10,14 @@ public class UserDetailsDTO {
     private String phoneNumber;
     
     // Patient specific fields
+    private Long patientId;
     private LocalDate dateOfBirth;
     private String gender;
     private String homeAddress;
     private String insuranceNumber;
 
     // Provider specific fields
+    private Long providerId;
     private String specialization;
     private String licenseNumber;
     
@@ -59,6 +61,14 @@ public class UserDetailsDTO {
 		this.phoneNumber = phoneNumber;
 	}
 	
+	public Long getPatientId() {
+		return patientId;
+	}
+
+	public void setPatientId(Long patientId) {
+		this.patientId = patientId;
+	}
+	
 	public LocalDate getDateOfBirth() {
 		return dateOfBirth;
 	}
@@ -89,6 +99,14 @@ public class UserDetailsDTO {
 	
 	public void setInsuranceNumber(String insuranceNumber) {
 		this.insuranceNumber = insuranceNumber;
+	}
+	
+	public Long getProviderId() {
+		return providerId;
+	}
+
+	public void setProviderId(Long providerId) {
+		this.providerId = providerId;
 	}
 	
 	public String getSpecialization() {

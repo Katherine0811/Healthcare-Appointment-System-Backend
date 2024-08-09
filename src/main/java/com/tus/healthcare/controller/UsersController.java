@@ -12,7 +12,7 @@ import com.tus.healthcare.dto.UserDetailsDTO;
 import com.tus.healthcare.exception.LoginException;
 import com.tus.healthcare.exception.RegistrationException;
 import com.tus.healthcare.model.Users;
-import com.tus.healthcare.service.impl.UsersServiceImpl;
+import com.tus.healthcare.service.UsersService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,7 +22,7 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/users")
 public class UsersController {
 	@Autowired
-    private UsersServiceImpl usersService;
+    private UsersService usersService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, Object> payload) {
@@ -58,6 +58,18 @@ public class UsersController {
             session.invalidate();
         }
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+    
+    @PutMapping("/{userId}")
+    public ResponseEntity<UserDetailsDTO> updateUser(@PathVariable Long userId, @RequestBody UserDetailsDTO userDetailsDTO) {
+    	UserDetailsDTO updatedUser = usersService.updateUser(userId, userDetailsDTO);
+        return ResponseEntity.ok(updatedUser);
+    }
+    
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
+        usersService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
     }
 }
 

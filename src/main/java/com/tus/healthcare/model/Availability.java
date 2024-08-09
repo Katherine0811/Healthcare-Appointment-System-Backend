@@ -1,7 +1,10 @@
 package com.tus.healthcare.model;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.util.List;
+
+import com.tus.healthcare.config.ListToJsonConverter;
+
 import java.time.LocalDateTime;
 import jakarta.persistence.*;
 
@@ -16,7 +19,10 @@ public class Availability {
     private Providers provider;
 
     private LocalDate availableDate;
-    private LocalTime availableTime;
+    
+    @Convert(converter = ListToJsonConverter.class)
+    private List<String> availableTimes;
+    
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     
@@ -41,11 +47,11 @@ public class Availability {
 		this.availableDate = availableDate;
 	}
 	
-	public LocalTime getAvailableTime() {
-		return availableTime;
+	public List<String> getAvailableTimes() {
+		return availableTimes;
 	}
-	public void setAvailableTime(LocalTime availableTime) {
-		this.availableTime = availableTime;
+	public void setAvailableTimes(List<String> availableTimes) {
+		this.availableTimes = availableTimes;
 	}
 	
 	public LocalDateTime getCreatedAt() {

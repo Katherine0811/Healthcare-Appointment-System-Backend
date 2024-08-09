@@ -1,8 +1,8 @@
 package com.tus.healthcare.service.impl;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.tus.healthcare.dto.UserDetailsDTO;
 import com.tus.healthcare.exception.LoginException;
 import com.tus.healthcare.exception.RegistrationException;
+import com.tus.healthcare.exception.UserNotFoundException;
 import com.tus.healthcare.model.Patients;
 import com.tus.healthcare.model.Providers;
 import com.tus.healthcare.model.Users;
@@ -31,29 +32,6 @@ public class UsersServiceImpl implements UsersService {
 
     @Autowired
     private ProvidersRepository providersRepository;
-    
-    @Autowired
-//    private BCryptPasswordEncoder bCryptPasswordEncoder;
-    
-    @Override
-    public List<Users> getAllUsers() {
-        return usersRepository.findAll();
-    }
-
-    @Override
-    public Users getUserById(Long id) {
-        return usersRepository.findById(id).orElse(null);
-    }
-
-    @Override
-    public Users saveUser(Users user) {
-        return usersRepository.save(user);
-    }
-
-    @Override
-    public void deleteUser(Long id) {
-        usersRepository.deleteById(id);
-    }
     
     @Transactional
     public Users register(Users user, Map<String, Object> payload) throws RegistrationException {
@@ -102,6 +80,7 @@ public class UsersServiceImpl implements UsersService {
         if ("Patient".equals(user.getRole())) {
             Patients patient = patientsRepository.findByUser(user);
             if (patient != null) {
+            	userDetailsDTO.setPatientId(patient.getPatientId());
                 userDetailsDTO.setDateOfBirth(patient.getDateOfBirth());
                 userDetailsDTO.setGender(patient.getGender());
                 userDetailsDTO.setHomeAddress(patient.getHomeAddress());
@@ -110,11 +89,48 @@ public class UsersServiceImpl implements UsersService {
         } else if ("Provider".equals(user.getRole())) {
             Providers provider = providersRepository.findByUser(user);
             if (provider != null) {
+            	userDetailsDTO.setProviderId(provider.getProviderId());
                 userDetailsDTO.setSpecialization(provider.getSpecialization());
                 userDetailsDTO.setLicenseNumber(provider.getLicenseNumber());
             }
         }
 
         return userDetailsDTO;
+    }
+    
+    public UserDetailsDTO updateUser(Long userId, UserDetailsDTO userDetailsDTO) {
+        Optional<Users> optionalUser = usersRepository.findById(userId);
+        Users user = optionalUser.orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+        userDetailsDTO.setUserId(user.getUserId());
+        user.setName(userDetailsDTO.getName());
+        user.setEmailAddress(userDetailsDTO.getEmailAddress());
+        user.setPhoneNumber(userDetailsDTO.getPhoneNumber());
+        usersRepository.save(user);
+
+        if ("Patient".equals(userDetailsDTO.getRole())) {
+            Patients patient = patientsRepository.findByUser(user);
+            if (patient != null) {
+            	userDetailsDTO.setPatientId(patient.getPatientId());
+                patient.setDateOfBirth(userDetailsDTO.getDateOfBirth());
+                patient.setGender(userDetailsDTO.getGender());
+                patient.setHomeAddress(userDetailsDTO.getHomeAddress());
+                patient.setInsuranceNumber(userDetailsDTO.getInsuranceNumber());
+                patientsRepository.save(patient);
+            }
+        } else if ("Provider".equals(userDetailsDTO.getRole())) {
+            Providers provider = providersRepository.findByUser(user);
+            if (provider != null) {
+            	userDetailsDTO.setProviderId(provider.getProviderId());
+                provider.setSpecialization(userDetailsDTO.getSpecialization());
+                provider.setLicenseNumber(userDetailsDTO.getLicenseNumber());
+                providersRepository.save(provider);
+            }
+        }
+        
+        return userDetailsDTO;
+    }
+
+    public void deleteUser(Long userId) {
+        usersRepository.deleteById(userId);
     }
 }
